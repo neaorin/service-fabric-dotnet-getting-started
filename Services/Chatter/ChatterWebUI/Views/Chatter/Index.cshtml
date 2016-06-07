@@ -36,7 +36,7 @@
     <script type="text/javascript">
                 //Get the location URL information
                 var appRoot = "";
-                var serviceUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
+                var serviceUrl = 'http://localhost:8491';
 
                 // Refresh the list of messages every 2 seconds
                 $(function () {
@@ -99,7 +99,7 @@
                     $.each(data, function (id, jobject) {
                         $('<li/>')
                             .append(
-                                $('<span class="message-time"/>').text($.time(jobject.Key)))
+                                $('<span class="message-time"/>').text(jobject.Key))
                             .append(
                                 $('<span class="message-from"/>').text(jobject.Value.Name))
 							.append(': ')
@@ -109,15 +109,15 @@
                     });
                 }
 
-                //Do formatting of returned datetime
-                $.time = function (dateObject) {
-                    var d = new Date(dateObject);
-                    var sec = d.getSeconds();
-                    var min = d.getMinutes();
-                    var hour = d.getHours();
-                    var time = hour + ":" + min + ":" + sec;
-                    return time;
-                };
+                ////Do formatting of returned datetime
+                //$.time = function (dateObject) {
+                //    var d = new Date(dateObject);
+                //    var sec = d.getSeconds();
+                //    var min = d.getMinutes();
+                //    var hour = d.getHours();
+                //    var time = hour + ":" + min + ":" + sec;
+                //    return time;
+                //};
 
     </script>
 </body>
