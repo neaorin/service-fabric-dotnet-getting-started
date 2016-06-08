@@ -100,7 +100,18 @@ namespace Chat.Domain
             { "Who was elected President of France, in 1981? (Francois ~)","Mitterrand" },
             { "The Kelvin scale is used to measure...","Temperature" },
             { "This Russian scientist used dogs to study conditioned reflexes. (Ivan ~)","Pavlov" },
-            { "What reading system is used by the blind?","Braille" }
+            { "What reading system is used by the blind?","Braille" },
+            { "What is the astronomical name for a group of stars?","Constellation" },
+            { "What is the term for the path followed a by a small body around a massive body in space?","Orbit" },
+            { "What phenomenon is caused by the gravitational attraction of the moon? (plural)","tides" },
+            { "What planet boasts the Great Red Spot?","Jupiter" },
+            { "What fruit bears the latin name 'citrus grandis'?","grapefruit" },
+            { "Name Donald Duck's girlfriend?","Daisy" },
+            { "This is the heaviest naturally occurring element.","uranium" },
+            { "What is the chemical symbol for gold?","Au" },
+            { "What is the main component of air?","Nitrogen" },
+            { "What is the symbol for iron in chemistry?","Fe" },
+            { "What is the symbol for silver?","Ag" }
         };
     }
 }
