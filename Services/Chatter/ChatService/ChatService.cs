@@ -38,6 +38,14 @@ namespace ChatWeb
             var currentQuestion =
                 await StateManager.GetOrAddAsync<IReliableQueue<KeyValuePair<string, string>>>("currentQuestion");
 
+            using (ITransaction tx = StateManager.CreateTransaction())
+            {
+                var currentScoreConditional = await scoresDictionary.TryGetValueAsync(tx, message.Name);
+                if (!currentScoreConditional.HasValue)
+                    await scoresDictionary.GetOrAddAsync(tx, message.Name, 0);
+                await tx.CommitAsync();
+            }
+
             //checking for the right answer
             using (ITransaction tx = this.StateManager.CreateTransaction())
             {
