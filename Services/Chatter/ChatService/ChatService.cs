@@ -17,13 +17,14 @@ namespace ChatWeb
     using Microsoft.ServiceFabric.Services.Communication.Runtime;
     using Microsoft.ServiceFabric.Services.Remoting.Runtime;
     using Microsoft.ServiceFabric.Services.Runtime;
-
+    using Chat.Domain;
     public class ChatService : StatefulService, IChatService
     {
         private const int MessagesToKeep = 50;
-        public ChatService (StatefulServiceContext context)
+        public ChatService(StatefulServiceContext context)
             : base(context)
-        { }
+        {
+        }
 
         public async Task AddMessageAsync(Message message)
         {
@@ -31,22 +32,81 @@ namespace ChatWeb
 
             IReliableDictionary<DateTime, Message> messagesDictionary =
                 await this.StateManager.GetOrAddAsync<IReliableDictionary<DateTime, Message>>("messages");
+            //dictionary for the scores
+            IReliableDictionary<string, int> scoresDictionary =
+                await StateManager.GetOrAddAsync<IReliableDictionary<string, int>>("scores");
+            var currentQuestion =
+                await StateManager.GetOrAddAsync<IReliableQueue<KeyValuePair<string, string>>>("currentQuestion");
 
             using (ITransaction tx = this.StateManager.CreateTransaction())
             {
                 await messagesDictionary.AddAsync(tx, time, message);
                 await tx.CommitAsync();
             }
+
+            //checking for the right answer
+            using (ITransaction tx = this.StateManager.CreateTransaction())
+            {
+                var question = await currentQuestion.TryPeekAsync(tx);
+                if (question.Value.Value.ToLowerInvariant().Trim()
+                    == message.MessageText.ToLowerInvariant().Trim())
+                {
+                    await messagesDictionary.AddAsync(tx, time,
+                        new Message { Name = "Admin", MessageText = "You are correct " + message.Name + "! You get one point for this" });
+                    //get and update the score
+                    var currentScoreConditional = await scoresDictionary.TryGetValueAsync(tx, message.Name);
+                    var currentScore = currentScoreConditional.HasValue ? currentScoreConditional.Value : 0;
+                    await scoresDictionary.GetOrAddAsync(tx, message.Name, currentScore++);
+                    await currentQuestion.ClearAsync();
+                    await currentQuestion.EnqueueAsync(tx, TriviaDatabase.GetRandomQuestion());
+                }
+
+            }
+        }
+
+        public async Task<string> GetCurrentQuestionAsync()
+        {
+            var currentQuestion =
+                await StateManager.GetOrAddAsync<IReliableQueue<KeyValuePair<string, string>>>("currentQuestion");
+            var currentQusetionString = string.Empty;
+            using (ITransaction tx = this.StateManager.CreateTransaction())
+            {
+                var question = await currentQuestion.TryPeekAsync(tx);
+                currentQusetionString = question.HasValue ? question.Value.Value : string.Empty;
+            }
+            return currentQusetionString;
+        }
+
+        public async Task<IEnumerable<KeyValuePair<string, int>>> GetScoresAsync()
+        {
+            IReliableDictionary<string, int> scoresDictionary =
+                await StateManager.GetOrAddAsync<IReliableDictionary<string, int>>("scores");
+            List<KeyValuePair<string, int>> returnList = new List<KeyValuePair<string, int>>();
+
+
+            using (ITransaction tx = this.StateManager.CreateTransaction())
+            {
+                var scoresEnumerable = await scoresDictionary.CreateEnumerableAsync(tx, EnumerationMode.Ordered);
+
+                using (IAsyncEnumerator<KeyValuePair<string, int>> enumerator = scoresEnumerable.GetAsyncEnumerator())
+                {
+                    while (await enumerator.MoveNextAsync(CancellationToken.None))
+                    {
+                        returnList.Add(enumerator.Current);
+                    }
+                }
+            }
+            return returnList;
         }
 
         public async Task<IEnumerable<KeyValuePair<DateTime, Message>>> GetMessagesAsync()
         {
             IReliableDictionary<DateTime, Message> messagesDictionary =
                 await this.StateManager.GetOrAddAsync<IReliableDictionary<DateTime, Message>>("messages");
-            List<KeyValuePair<DateTime, Message>> returnList = new List<KeyValuePair<DateTime, Message>>(); 
+            List<KeyValuePair<DateTime, Message>> returnList = new List<KeyValuePair<DateTime, Message>>();
 
             using (ITransaction tx = this.StateManager.CreateTransaction())
-            {                
+            {
                 var messagesEnumerable = await messagesDictionary.CreateEnumerableAsync(tx, EnumerationMode.Ordered);
 
                 using (IAsyncEnumerator<KeyValuePair<DateTime, Message>> enumerator = messagesEnumerable.GetAsyncEnumerator())
@@ -71,7 +131,7 @@ namespace ChatWeb
 
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
-                  return new List<ServiceReplicaListener> {
+            return new List<ServiceReplicaListener> {
                 new ServiceReplicaListener(initParams => this.CreateServiceRemotingListener<ChatService>(initParams))
             };
         }
@@ -105,7 +165,7 @@ namespace ChatWeb
                         int messagesCount = (int)await messagesDictionary.GetCountAsync(tx);
 
                         foreach (KeyValuePair<DateTime, Message> item in oldMessages.Take(messagesCount - MessagesToKeep))
-                        {                            
+                        {
                             await messagesDictionary.TryRemoveAsync(tx, item.Key);
                         }
                         await tx.CommitAsync();
