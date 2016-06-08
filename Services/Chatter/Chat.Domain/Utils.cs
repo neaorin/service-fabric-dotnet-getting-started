@@ -9,8 +9,8 @@ namespace Chat.Domain
     public class Utils
     {
         static Random rand = new Random();
-        static char[] Consonants = { 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z' };
-        static char[] Vowels = { 'a','e','i','o','u' };
+        static char[] Consonants = { 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z' };
+        static char[] Vowels = { 'A','E','I','O','U' };
         public char[] GenerateLetters(int minNumberOfLetters, int maxNumberOfLetters)
         {
             var numLetters = rand.Next(minNumberOfLetters, maxNumberOfLetters + 1);
@@ -32,8 +32,8 @@ namespace Chat.Domain
 
         public bool WordContainsAllLetters(string word, char[] letters)
         {
-            string lowercase = word.ToLower().Trim();
-            return letters.All(l => word.Contains(l));
+            string uppercase = word.ToUpper().Trim();
+            return letters.All(l => uppercase.Contains(l));
         }
 
         private static void Shuffle<T>(T[] array)
