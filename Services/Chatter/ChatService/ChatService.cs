@@ -48,7 +48,8 @@ namespace ChatWeb
             using (ITransaction tx = this.StateManager.CreateTransaction())
             {
                 var question = await currentQuestion.TryPeekAsync(tx);
-                if (question.Value.Value.ToLowerInvariant().Trim()
+                if ("x"
+                    //question.Value.Value.ToLowerInvariant().Trim()
                     == message.MessageText.ToLowerInvariant().Trim())
                 {
                     await messagesDictionary.AddAsync(tx, time,
@@ -59,6 +60,7 @@ namespace ChatWeb
                     await scoresDictionary.GetOrAddAsync(tx, message.Name, currentScore++);
                     await currentQuestion.ClearAsync();
                     await currentQuestion.EnqueueAsync(tx, TriviaDatabase.GetRandomQuestion());
+                    await tx.CommitAsync();
                 }
 
             }
