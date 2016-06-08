@@ -66,8 +66,8 @@ namespace ChatWeb
                             new Message { Name = "Admin", MessageText = "You are correct " + message.Name + "! You get one point for this" });
                         //get and update the score
                         var currentScoreConditional = await scoresDictionary.TryGetValueAsync(tx, message.Name);
-                        var currentScore = currentScoreConditional.HasValue ? currentScoreConditional.Value : 0;
-                        await scoresDictionary.GetOrAddAsync(tx, message.Name, ++currentScore);
+                        var currentScore = currentScoreConditional.HasValue ? currentScoreConditional.Value + 1 : 0;
+                        await scoresDictionary.AddOrUpdateAsync(tx, message.Name, currentScore, (x, y) => ++y);
                         await currentQuestion.TryDequeueAsync(tx);
                         await currentQuestion.EnqueueAsync(tx, TriviaDatabase.GetRandomQuestion());
                         await tx.CommitAsync();
