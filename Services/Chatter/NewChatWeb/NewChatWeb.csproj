@@ -124,6 +124,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\ChatController.cs" />
+    <Compile Include="Controllers\QuestionController.cs" />
     <Compile Include="Models\IChatService.cs" />
     <Compile Include="Models\IMessageRepository.cs" />
     <Compile Include="Models\Message.cs" />

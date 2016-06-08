@@ -2,10 +2,10 @@
 
 	//Get the location URL information
 	var appRoot = "";
-	var serviceUrl = 'http://localhost:8491';
+	var serviceUrl = 'http://localhost:8081';
 
 	// Refresh the list of messages every 2 seconds
-	setInterval(function () { GetMessages(); }, 2000);
+	setInterval(function () { GetMessages(); GetCurrentQuestion(); }, 2000);
 
 
 	$('#sendButton').click(function () {
@@ -68,32 +68,46 @@
 			});
 	}
 
+	function GetCurrentQuestion() {
+		$.ajax({
+
+			url: serviceUrl + appRoot + '/api/question/',
+			type: 'GET',
+			contentType: 'application/json',
+			datatype: 'json',
+			cache: false
+		})
+			.done(function (getMessageResult) {
+				$("#lblQuestion").text(getMessageResult);
+			});
+	}
+
 	//Take returned messages and construct list items
-	function bindData(element, data) {
+function bindData(element, data) {
 
-		$('#messages').empty();
+	$('#messages').empty();
 
-		$.each(data, function (id, jobject) {
-			$('<li/>')
-				.append(
-					$('<span class="message-time"/>').text(formatDateTime(jobject.Key)))
-				.append(
-					$('<span class="message-from"/>').text(jobject.Value.Name))
-				.append(': ')
-				.append(
-					 $('<span class="message-body"/>').text(jobject.Value.MessageText))
-				.appendTo(element);
+	$.each(data, function (id, jobject) {
+		$('<li/>')
+			.append(
+				$('<span class="message-time"/>').text(formatDateTime(jobject.Key)))
+			.append(
+				$('<span class="message-from"/>').text(jobject.Value.Name))
+			.append(': ')
+			.append(
+				 $('<span class="message-body"/>').text(jobject.Value.MessageText))
+			.appendTo(element);
 		});
 	}
 
-	function formatDateTime(dateObject) {
-		var d = new Date(dateObject);
-		var sec = d.getSeconds();
-		var min = d.getMinutes();
-		var hour = d.getHours();
-		var time = "(" + hour + ":" + min + ":" + sec +") ";
+function formatDateTime(dateObject) {
+	var d = new Date(dateObject);
+	var sec = d.getSeconds();
+	var min = d.getMinutes();
+	var hour = d.getHours();
+	var time = "(" + hour + ":" + min + ":" + sec + ") ";
 
-		return time;
+	return time;
 	}
 
 });
