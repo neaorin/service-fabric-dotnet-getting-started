@@ -38,29 +38,38 @@ namespace ChatWeb
             var currentQuestion =
                 await StateManager.GetOrAddAsync<IReliableQueue<KeyValuePair<string, string>>>("currentQuestion");
 
-            using (ITransaction tx = this.StateManager.CreateTransaction())
-            {
-                await messagesDictionary.AddAsync(tx, time, message);
-                await tx.CommitAsync();
-            }
-
             //checking for the right answer
             using (ITransaction tx = this.StateManager.CreateTransaction())
             {
-                var question = await currentQuestion.TryPeekAsync(tx);
-                if ("x"
-                    //question.Value.Value.ToLowerInvariant().Trim()
-                    == message.MessageText.ToLowerInvariant().Trim())
+                if (message.MessageText.ToLowerInvariant().Trim() == "first question")
                 {
-                    await messagesDictionary.AddAsync(tx, time,
-                        new Message { Name = "Admin", MessageText = "You are correct " + message.Name + "! You get one point for this" });
-                    //get and update the score
-                    var currentScoreConditional = await scoresDictionary.TryGetValueAsync(tx, message.Name);
-                    var currentScore = currentScoreConditional.HasValue ? currentScoreConditional.Value : 0;
-                    await scoresDictionary.GetOrAddAsync(tx, message.Name, currentScore++);
-                    await currentQuestion.ClearAsync();
-                    await currentQuestion.EnqueueAsync(tx, TriviaDatabase.GetRandomQuestion());
+                    var q = TriviaDatabase.GetRandomQuestion();
+                    await currentQuestion.TryDequeueAsync(tx);
+                    await currentQuestion.EnqueueAsync(tx, q);
                     await tx.CommitAsync();
+                }
+                else
+                {
+                    var question = await currentQuestion.TryPeekAsync(tx);
+                    if (question.Value.Value.ToLowerInvariant().Trim()
+                        == message.MessageText.ToLowerInvariant().Trim())
+                    {
+                        await messagesDictionary.AddAsync(tx, time,
+                            new Message { Name = "Admin", MessageText = "You are correct " + message.Name + "! You get one point for this" });
+                        //get and update the score
+                        var currentScoreConditional = await scoresDictionary.TryGetValueAsync(tx, message.Name);
+                        var currentScore = currentScoreConditional.HasValue ? currentScoreConditional.Value : 0;
+                        await scoresDictionary.GetOrAddAsync(tx, message.Name, currentScore++);
+                        await currentQuestion.TryDequeueAsync(tx);
+                        await currentQuestion.EnqueueAsync(tx, TriviaDatabase.GetRandomQuestion());
+                        await tx.CommitAsync();
+                    }
+                    else
+                    {
+
+                        await messagesDictionary.AddAsync(tx, time, message);
+                        await tx.CommitAsync();
+                    }
                 }
 
             }
@@ -74,7 +83,7 @@ namespace ChatWeb
             using (ITransaction tx = this.StateManager.CreateTransaction())
             {
                 var question = await currentQuestion.TryPeekAsync(tx);
-                currentQusetionString = question.HasValue ? question.Value.Value : string.Empty;
+                currentQusetionString = question.HasValue ? question.Value.Key : string.Empty;
             }
             return currentQusetionString;
         }
