@@ -9,7 +9,7 @@ using System.Web.Http.Cors;
 
 namespace NewChatWeb.Controllers
 {
-    [EnableCors("http://localhost:3681", headers: "*", methods: "*")]
+    [EnableCors("*", headers: "*", methods: "*")]
     public class QuestionController : ApiController
     {
         public IMessageRepository Messages { get; set; }

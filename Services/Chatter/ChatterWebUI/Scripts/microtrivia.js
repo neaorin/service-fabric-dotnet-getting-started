@@ -2,7 +2,7 @@
 
 	//Get the location URL information
 	var appRoot = "";
-	var serviceUrl = 'http://localhost:8081';
+	var serviceUrl = 'http://wordtriviacluster.westeurope.cloudapp.azure.com:8081';
 
 	// Refresh the list of messages every 2 seconds
 	setInterval(function () { GetMessages(); GetCurrentQuestion(); GetLeaderboard(); }, 2000);

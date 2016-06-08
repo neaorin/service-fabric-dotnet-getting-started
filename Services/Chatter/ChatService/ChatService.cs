@@ -49,7 +49,7 @@ namespace ChatWeb
             //checking for the right answer
             using (ITransaction tx = this.StateManager.CreateTransaction())
             {
-                if (message.MessageText.ToLowerInvariant().Trim() == "first question")
+                if (message.MessageText.ToLowerInvariant().Trim() == "try me")
                 {
                     var q = TriviaDatabase.GetRandomQuestion();
                     await currentQuestion.TryDequeueAsync(tx);
@@ -63,6 +63,8 @@ namespace ChatWeb
                         == message.MessageText.ToLowerInvariant().Trim())
                     {
                         await messagesDictionary.AddAsync(tx, time,
+                               new Message { Name = message.Name, MessageText = message.MessageText });
+                        await messagesDictionary.AddAsync(tx, time.AddTicks(1),
                             new Message { Name = "Admin", MessageText = "You are correct " + message.Name + "! You get one point for this" });
                         //get and update the score
                         var currentScoreConditional = await scoresDictionary.TryGetValueAsync(tx, message.Name);
