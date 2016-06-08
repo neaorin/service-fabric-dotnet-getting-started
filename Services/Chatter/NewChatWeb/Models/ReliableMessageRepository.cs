@@ -61,5 +61,33 @@ namespace NewChatWeb.Models
                 throw;
             }
         }
+
+        public Task<string> GetCurrentQuestionAsync()
+        {
+            try
+            {
+                IChatService proxy = ServiceProxy.Create<IChatService>(chatServiceInstance, new ServicePartitionKey(1));
+                return proxy.GetCurrentQuestionAsync();
+            }
+            catch (Exception e)
+            {
+                ServiceEventSource.Current.Message("GetCurrentQuestionAsync failed because of error {0}", e.ToString());
+                throw;
+            }
+        }
+
+        public Task<IEnumerable<KeyValuePair<string, int>>> GetScoresAsync()
+        {
+            try
+            {
+                IChatService proxy = ServiceProxy.Create<IChatService>(chatServiceInstance, new ServicePartitionKey(1));
+                return proxy.GetScoresAsync();
+            }
+            catch (Exception e)
+            {
+                ServiceEventSource.Current.Message("GetScoresAsync failed because of error {0}", e.ToString());
+                throw;
+            }
+        }
     }
 }

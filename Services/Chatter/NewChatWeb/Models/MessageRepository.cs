@@ -29,6 +29,16 @@ namespace NewChatWeb.Models
             return Task.FromResult(true);
         }
 
+        public Task<string> GetCurrentQuestionAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<KeyValuePair<string, int>>> GetScoresAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         Task<IEnumerable<KeyValuePair<DateTime, Message>>> IMessageRepository.GetMessagesAsync()
         {
             return Task.FromResult(Messages.Select(x => x));
