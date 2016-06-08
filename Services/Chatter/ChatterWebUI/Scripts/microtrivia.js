@@ -5,7 +5,7 @@
 	var serviceUrl = 'http://localhost:8081';
 
 	// Refresh the list of messages every 2 seconds
-	setInterval(function () { GetMessages(); GetCurrentQuestion(); }, 2000);
+	setInterval(function () { GetMessages(); GetCurrentQuestion(); GetLeaderboard(); }, 2000);
 
 
 	$('#sendButton').click(function () {
@@ -82,6 +82,20 @@
 			});
 	}
 
+	function GetLeaderboard() {
+		$.ajax({
+
+	url: serviceUrl +appRoot + '/api/leaderboard/',
+			type: 'GET',
+		contentType: 'application/json',
+			datatype: 'json',
+				cache: false
+			})
+			.done(function (getMessageResult) {
+				bindScores($('#leaderboard'), getMessageResult);
+			});
+			}
+
 	//Take returned messages and construct list items
 function bindData(element, data) {
 
@@ -98,7 +112,22 @@ function bindData(element, data) {
 				 $('<span class="message-body"/>').text(jobject.Value.MessageText))
 			.appendTo(element);
 		});
-	}
+}
+
+function bindScores(element, data) {
+
+	$('#leaderboard').empty();
+
+	$.each(data, function (id, jobject) {
+		$('<li/>')
+			.append(
+				$('<span class="leader-name"/>').text(jobject.Key))
+			.append(': ')
+			.append(
+				$('<span class="leader-score"/>').text(jobject.Value))
+			.appendTo(element);
+	});
+}
 
 function formatDateTime(dateObject) {
 	var d = new Date(dateObject);
