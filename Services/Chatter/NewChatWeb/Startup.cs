@@ -19,7 +19,7 @@ namespace NewChatWeb
             HttpConfiguration config = new HttpConfiguration();
 
             var container = new UnityContainer();
-            container.RegisterType<IMessageRepository, MessageRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<IMessageRepository, ReliableMessageRepository>(new HierarchicalLifetimeManager());
             config.DependencyResolver = new UnityResolver(container);
 
             config.EnableCors();

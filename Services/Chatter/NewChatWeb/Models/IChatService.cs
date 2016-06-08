@@ -7,7 +7,7 @@ namespace NewChatWeb.Domain
 {
     using System;
     using System.Collections.Generic;
-    using System.Threading.Tasks;    
+    using System.Threading.Tasks;
     using Microsoft.ServiceFabric.Services.Remoting;
 
     public interface IChatService : IService
@@ -15,5 +15,7 @@ namespace NewChatWeb.Domain
         Task AddMessageAsync(Message message);
         Task<IEnumerable<KeyValuePair<DateTime, Message>>> GetMessagesAsync();
         Task ClearMessagesAsync();
+
+        Task<string> GetQuestion();
     }
 }
