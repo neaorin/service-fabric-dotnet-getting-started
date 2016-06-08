@@ -15,5 +15,8 @@ namespace NewChatWeb.Models
         Task AddMessageAsync(Message message);
         Task<IEnumerable<KeyValuePair<DateTime, Message>>> GetMessagesAsync();
         Task ClearMessagesAsync();
+
+        Task<string> GetCurrentQuestionAsync();
+        Task<IEnumerable<KeyValuePair<string, int>>> GetScoresAsync();
     }
 }

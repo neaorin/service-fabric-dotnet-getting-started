@@ -2,7 +2,7 @@
 
 	//Get the location URL information
 	var appRoot = "";
-	var serviceUrl = 'http://localhost:8491';
+	var serviceUrl = 'http://localhost:8081';
 
 	// Refresh the list of messages every 2 seconds
 	setInterval(function () { GetMessages(); GetCurrentQuestion(); }, 2000);
