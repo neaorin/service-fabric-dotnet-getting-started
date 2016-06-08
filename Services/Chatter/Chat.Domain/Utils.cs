@@ -32,8 +32,8 @@ namespace Chat.Domain
 
         public bool WordContainsAllLetters(string word, char[] letters)
         {
-            string lowercase = word.ToUpper().Trim();
-            return letters.All(l => word.Contains(l));
+            string uppercase = word.ToUpper().Trim();
+            return letters.All(l => uppercase.Contains(l));
         }
 
         private static void Shuffle<T>(T[] array)
