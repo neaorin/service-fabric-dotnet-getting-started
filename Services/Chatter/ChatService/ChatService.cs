@@ -67,7 +67,7 @@ namespace ChatWeb
                         //get and update the score
                         var currentScoreConditional = await scoresDictionary.TryGetValueAsync(tx, message.Name);
                         var currentScore = currentScoreConditional.HasValue ? currentScoreConditional.Value : 0;
-                        await scoresDictionary.GetOrAddAsync(tx, message.Name, currentScore++);
+                        await scoresDictionary.GetOrAddAsync(tx, message.Name, ++currentScore);
                         await currentQuestion.TryDequeueAsync(tx);
                         await currentQuestion.EnqueueAsync(tx, TriviaDatabase.GetRandomQuestion());
                         await tx.CommitAsync();
