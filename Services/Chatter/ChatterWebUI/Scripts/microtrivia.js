@@ -9,7 +9,8 @@
 
 
 	$('#sendButton').click(function () {
-		AddMessage();
+	    AddMessage();
+	    $('#inputMessage').val('');
 	});
 
 	$('#regButton').click(function () {
